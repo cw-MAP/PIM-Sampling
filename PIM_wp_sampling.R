@@ -37,29 +37,37 @@ dta <- as.data.table(dta)
 # ------------------------------------------------------------------------------ 
 
 # rename common variables
-dta <- rename(dta, 
-              grant_number = Grants.Grant.Number, 
-              project_number = Project.Data..Hybrid..Project.Number, 
-              admin_1 = Project.Data..Hybrid..Admin.Unit.1, 
-              admin_2 = Project.Data..Hybrid..Admin.Unit.2,
-              admin_3 = Project.Data..Hybrid..Admin.Unit.3, 
-              admin_4 = Project.Data..Hybrid..Admin.Unit.4, 
-              location_type = Project.Data..Hybrid..Location.Type, 
-              new_rehab = Project.Data..Hybrid..New.or.Rehab,
-              inventory_type = Project.Data..Hybrid..Water.Inventory.Type,
-              community = Project.Data..Hybrid..Community.Name)
+# dta <- rename(dta, 
+#               grant_number = Grants.Grant.Number, 
+#               project_number = Project.Data..Hybrid..Project.Number, 
+#               admin_1 = Project.Data..Hybrid..Admin.Unit.1, 
+#               admin_2 = Project.Data..Hybrid..Admin.Unit.2,
+#               admin_3 = Project.Data..Hybrid..Admin.Unit.3, 
+#               admin_4 = Project.Data..Hybrid..Admin.Unit.4, 
+#               location_type = Project.Data..Hybrid..Location.Type, 
+#               new_rehab = Project.Data..Hybrid..New.or.Rehab,
+#               inventory_type = Project.Data..Hybrid..Water.Inventory.Type,
+#               community = Project.Data..Hybrid..Community.Name)
+
+dta <- rename(dta,
+              grant_number = Grant.Number,
+              project_number = Project.Number,
+              admin_1 = Admin.Unit.1,
+              admin_2 = Admin.Unit.2,
+              admin_3 = Admin.Unit.3,
+              admin_4 = Admin.Unit.4,
+              location_type = Location.Type,
+              new_rehab = New.or.Rehab,
+              inventory_type = Water.Inventory.Type,
+              community = Community.Name)
+
 
 # drop health centers
-dta <- dta[!(dta$location_type == "health center/clinic"),]
+dta <- dta[!(dta$location_type == "health center/clinic" | dta$location_type == "Health Center/Clinic"),]
 
 
 # data entry errors
-dta$admin_1 <- ifelse(dta$admin_1 == "MARADI", "Maradi", dta$admin_1)
-dta$admin_2 <- ifelse(dta$admin_2 == "GUIDAN ROUMDJI", "Guidan Roumdji", dta$admin_2)
-dta$location_type <- ifelse(dta$location_type == "community", "Community", dta$location_type)
-dta$location_type <- ifelse(dta$location_type == "school", "School", dta$location_type)
-dta$inventory_type <- ifelse(dta$inventory_type == "Water Point And Sanitation", "Water Point and Sanitation", dta$inventory_type)
-dta$community <- ifelse(dta$community == "Water Point And Sanitation", "Water Point and Sanitation", dta$community)
+# dta$admin_1 <- ifelse(dta$admin_1 == "MARADI", "Maradi", dta$admin_1)
 
 
 # collapse by community
@@ -142,7 +150,7 @@ wp_byinventory$pct <- round(wp_byinventory$N / wp_all, 2)
 # ------------------------------------------------------------------------------ 
 
 # define total sample size
-sample_size <- 110
+sample_size <- 100
 
 
 for (i in 1:length(grants)) {
