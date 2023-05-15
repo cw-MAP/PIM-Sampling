@@ -15,15 +15,15 @@ library(collapse)
 library(stringr)
 
 # set seed
-#set.seed(1342)
-set.seed(54312)
+set.seed(1342)
+# set.seed(54312)
 
 # ------------------------------------------------------------------------------ 
 # Data import
 # ------------------------------------------------------------------------------
 
 # set directory
-setwd("/Users/scott.miller/Library/CloudStorage/Box-Box/Water Programs/M&E/02_Partner Planning Folders/WV_Niger/Site lists and sampling/PIM 2022")
+setwd("")
 
 # import data
 dta <- read.csv("All Project Data.csv",na.strings=c(""," ", "N/A","NA"))
@@ -37,37 +37,38 @@ dta <- as.data.table(dta)
 # ------------------------------------------------------------------------------ 
 
 # rename common variables
-# dta <- rename(dta, 
-#               grant_number = Grants.Grant.Number, 
-#               project_number = Project.Data..Hybrid..Project.Number, 
-#               admin_1 = Project.Data..Hybrid..Admin.Unit.1, 
-#               admin_2 = Project.Data..Hybrid..Admin.Unit.2,
-#               admin_3 = Project.Data..Hybrid..Admin.Unit.3, 
-#               admin_4 = Project.Data..Hybrid..Admin.Unit.4, 
-#               location_type = Project.Data..Hybrid..Location.Type, 
-#               new_rehab = Project.Data..Hybrid..New.or.Rehab,
-#               inventory_type = Project.Data..Hybrid..Water.Inventory.Type,
-#               community = Project.Data..Hybrid..Community.Name)
-
 dta <- rename(dta,
-              grant_number = Grant.Number,
-              project_number = Project.Number,
-              admin_1 = Admin.Unit.1,
-              admin_2 = Admin.Unit.2,
-              admin_3 = Admin.Unit.3,
-              admin_4 = Admin.Unit.4,
-              location_type = Location.Type,
-              new_rehab = New.or.Rehab,
-              inventory_type = Water.Inventory.Type,
-              community = Community.Name)
+              grant_number = Grants.Grant.Number,
+              project_number = Project.Data..Hybrid..Project.Number,
+              admin_1 = Project.Data..Hybrid..Admin.Unit.1,
+              admin_2 = Project.Data..Hybrid..Admin.Unit.2,
+              admin_3 = Project.Data..Hybrid..Admin.Unit.3,
+              admin_4 = Project.Data..Hybrid..Admin.Unit.4,
+              location_type = Project.Data..Hybrid..Location.Type,
+              new_rehab = Project.Data..Hybrid..New.or.Rehab,
+              inventory_type = Project.Data..Hybrid..Water.Inventory.Type,
+              community = Project.Data..Hybrid..Community.Name)
+
+# dta <- rename(dta,
+#               grant_number = Grant.Number,
+#               project_number = Project.Number,
+#               admin_1 = Admin.Unit.1,
+#               admin_2 = Admin.Unit.2,
+#               admin_3 = Admin.Unit.3,
+#               admin_4 = Admin.Unit.4,
+#               location_type = Location.Type,
+#               new_rehab = New.or.Rehab,
+#               inventory_type = Water.Inventory.Type,
+#               community = Community.Name)
 
 
 # drop health centers
-dta <- dta[!(dta$location_type == "health center/clinic" | dta$location_type == "Health Center/Clinic"),]
+# dta <- dta[!(dta$location_type == "health center/clinic" | dta$location_type == "Health Center/Clinic"),]
+# dta <- dta[!(dta$location_type == "School" | dta$location_type == "school"),]
 
 
 # data entry errors
-# dta$admin_1 <- ifelse(dta$admin_1 == "MARADI", "Maradi", dta$admin_1)
+# dta$admin_1 <- ifelse(dta$admin_1 == "Southern", "South", dta$admin_1)
 
 
 # collapse by community
@@ -81,9 +82,9 @@ for (j in 1:ncol(dta1)) {
 }
 
 dta1 <- collap(dta1, ~ admin_3 + community, catFUN = flast,         # Aggregate only categorical data
-            cols = is_categorical)
+               cols = is_categorical)
 
-dta <- dta <- as.data.table(dta1)
+dta <- as.data.table(dta1[,-c(9,14)])
 # -------------------------------
 
 
@@ -184,15 +185,15 @@ grant_5$rand <- runif(nrow(grant_5))
 grant_6$rand <- runif(nrow(grant_6))
     grant_6 <- grant_6[order(grant_6$rand),]
         grant_6 <- grant_6[1:grant_6_n,]
-# grant_7$rand <- runif(nrow(grant_7))
-#     grant_7 <- grant_5[order(grant_7$rand),]
-#         grant_7 <- grant_7[1:grant_7_n,]
-# grant_8$rand <- runif(nrow(grant_8))
-#     grant_8 <- grant_5[order(grant_8$rand),]
-#         grant_8 <- grant_8[1:grant_8_n,]
-# grant_9$rand <- runif(nrow(grant_9))
-#     grant_9 <- grant_5[order(grant_9$rand),]
-#         grant_9 <- grant_9[1:grant_9_n,]
+grant_7$rand <- runif(nrow(grant_7))
+    grant_7 <- grant_7[order(grant_7$rand),]
+        grant_7 <- grant_7[1:grant_7_n,]
+grant_8$rand <- runif(nrow(grant_8))
+    grant_8 <- grant_8[order(grant_8$rand),]
+        grant_8 <- grant_8[1:grant_8_n,]
+grant_9$rand <- runif(nrow(grant_9))
+    grant_9 <- grant_9[order(grant_9$rand),]
+        grant_9 <- grant_9[1:grant_9_n,]
 # grant_10$rand <- runif(nrow(grant_10))
 #     grant_10 <- grant_10[order(grant_10$rand),]
 #         grant_10 <- grant_10[1:grant_10_n,]
@@ -203,30 +204,70 @@ sample <- rbind(grant_1,
                     grant_3,
                     grant_4,
                     grant_5,
-                    grant_6
-                    # grant_7,
-                    # grant_8,
-                    # grant_9, 
+                    grant_6,
+                    grant_7,
+                    grant_8,
+                    grant_9
                     # grant_10
         )        
 
 
-wp_bygrant$sample_pct <- round((sample[, .N, by = "grant_number"]$N / nrow(sample)), 2)
-wp_bygrant
-wp_byadmin1$sample_pct <- round((sample[, .N, by = "admin_1"]$N / nrow(sample)), 2)
-wp_byadmin1
-wp_byadmin2$sample_pct <- round((sample[, .N, by = "admin_2"]$N / nrow(sample)), 2)
-wp_byadmin2
-wp_bylocation$sample_pct <- round((sample[, .N, by = "location_type"]$N / nrow(sample)), 2)
-wp_bylocation
-wp_bynew_rehab$sample_pct <- round((sample[, .N, by = "new_rehab"]$N / nrow(sample)), 2)
-wp_bynew_rehab
-wp_byinventory$sample_pct <- round((sample[, .N, by = "inventory_type"]$N / nrow(sample)), 2)
-wp_byinventory
+# wp_bygrant$sample_pct <- round((sample[, .N, by = "grant_number"]$N / nrow(sample)), 2)
+# wp_bygrant
+# # wp_byadmin1$sample_pct <- round((sample[, .N, by = "admin_1"]$N / nrow(sample)), 2)
+# # wp_byadmin1
+# # wp_byadmin2$sample_pct <- round((sample[, .N, by = "admin_2"]$N / nrow(sample)), 2)
+# # wp_byadmin2
+# wp_bylocation$sample_pct <- round((sample[, .N, by = "location_type"]$N / nrow(sample)), 2)
+# wp_bylocation
+# wp_bynew_rehab$sample_pct <- round((sample[, .N, by = "new_rehab"]$N / nrow(sample)), 2)
+# wp_bynew_rehab
+# wp_byinventory$sample_pct <- round((sample[, .N, by = "inventory_type"]$N / nrow(sample)), 2)
+# wp_byinventory
 
+
+# ------------------------------------------------------------------------------ 
+# check validity of sample
+# ------------------------------------------------------------------------------ 
+
+# Define the required variables
+required_vars <- c("grant_number", "admin_1", "admin_2", "location_type", "new_rehab", "inventory_type")
+
+# Create a function to calculate the frequency of observations in each dimension
+calculate_frequencies <- function(data, sampled_data, var_name) {
+    original_frequencies <- data %>% group_by(!!sym(var_name)) %>% summarise(Frequency = n() / nrow(data) * 100)
+    sampled_frequencies <- sampled_data %>% group_by(!!sym(var_name)) %>% summarise(Frequency_sampled = n() / nrow(sampled_data) * 100)
+    frequency_table <- full_join(original_frequencies, sampled_frequencies, by = var_name)
+    colnames(frequency_table) <- c(var_name, "Frequency", "Frequency_sampled")
+    frequency_table$Dimension <- var_name
+    return(frequency_table)
+}
+
+# Initialize an empty list for the comparison table
+comparison_tables <- list()
+
+# Calculate frequencies for each dimension and append to the comparison tables list
+for (dim in required_vars) {
+    dim_frequencies <- calculate_frequencies(dta, sample, dim)
+    comparison_tables[[dim]] <- dim_frequencies
+}
+
+# Bind all the frequency tables together
+comparison_table <- bind_rows(comparison_tables)
+
+# Reorder the columns
+comparison_table <- comparison_table[, c("Dimension", colnames(comparison_table)[colnames(comparison_table) != "Dimension"])]
+
+# Print the comparison table
+print(comparison_table, n=30)
+
+
+# ------------------------------------------------------------------------------ 
+# Save sample to project folder
+# ------------------------------------------------------------------------------ 
 
 write_xlsx(list(sample = sample), 
-           path = "NE.WVI_PIM_sample.xlsx")
+           path = "_PIM_sample.xlsx")
 
 
 
